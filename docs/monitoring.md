@@ -55,7 +55,7 @@ When using the file-system provider class (see `spark.history.provider` below), 
 directory must be supplied in the `spark.history.fs.logDirectory` configuration option,
 and should contain sub-directories that each represents an application's event logs.
 
-The spark jobs themselves must be configured to log events, and to log them to the same shared,
+The Spark jobs themselves must be configured to log events, and to log them to the same shared,
 writable directory. For example, if the server was configured with a log directory of
 `hdfs://namenode/shared/spark-logs`, then the client-side options would be:
 
@@ -101,20 +101,20 @@ A long-running application (e.g. streaming) can bring a huge single event log fi
 also requires a bunch of resource to replay per each update in Spark History Server.
 
 Enabling <code>spark.eventLog.rolling.enabled</code> and <code>spark.eventLog.rolling.maxFileSize</code> would
-let you have rolling event log files instead of single huge event log file which may help some scenarios on its own,
-but it still doesn't help you reducing the overall size of logs.
+let you have rolling event log files instead of a single huge event log file which may help some scenarios on its own,
+but it still doesn't help you reduce the overall size of logs.
 
 Spark History Server can apply compaction on the rolling event log files to reduce the overall size of
 logs, via setting the configuration <code>spark.history.fs.eventLog.rolling.maxFilesToRetain</code> on the
 Spark History Server.
 
-Details will be described below, but please note in prior that compaction is LOSSY operation.
+Details will be described below, but please note in prior that compaction is a LOSSY operation.
 Compaction will discard some events which will be no longer seen on UI - you may want to check which events will be discarded
 before enabling the option.
 
 When the compaction happens, the History Server lists all the available event log files for the application, and considers
 the event log files having less index than the file with smallest index which will be retained as target of compaction.
-For example, if the application A has 5 event log files and <code>spark.history.fs.eventLog.rolling.maxFilesToRetain</code> is set to 2, then first 3 log files will be selected to be compacted.
+For example, if the application A has 5 event log files and <code>spark.history.fs.eventLog.rolling.maxFilesToRetain</code> is set to 2, then the first 3 log files will be selected to be compacted.
 
 Once it selects the target, it analyzes them to figure out which events can be excluded, and rewrites them
 into one compact file with discarding events which are decided to exclude.
@@ -128,13 +128,13 @@ The compaction tries to exclude the events which point to the outdated data. As 
 Once rewriting is done, original log files will be deleted, via best-effort manner. The History Server may not be able to delete
 the original log files, but it will not affect the operation of the History Server.
 
-Please note that Spark History Server may not compact the old event log files if figures out not a lot of space
+Please note that Spark History Server may not compact the old event log files if it figures out not a lot of space
 would be reduced during compaction. For streaming query we normally expect compaction
 will run as each micro-batch will trigger one or more jobs which will be finished shortly, but compaction won't run
 in many cases for batch query.
 
 Please also note that this is a new feature introduced in Spark 3.0, and may not be completely stable. Under some circumstances,
-the compaction may exclude more events than you expect, leading some UI issues on History Server for the application.
+the compaction may exclude more events than you expect, leading to some UI issues on History Server for the application.
 Use it with caution.
 
 ### Spark History Server Configuration Options
@@ -421,7 +421,7 @@ to handle the Spark Context setup and tear down.
 
 In addition to viewing the metrics in the UI, they are also available as JSON.  This gives developers
 an easy way to create new visualizations and monitoring tools for Spark.  The JSON is available for
-both running applications, and in the history server.  The endpoints are mounted at `/api/v1`.  Eg.,
+both running applications, and in the history server.  The endpoints are mounted at `/api/v1`.  E.g.,
 for the history server, they would typically be accessible at `http://<server-url>:18080/api/v1`, and
 for a running application, at `http://localhost:4040/api/v1`.
 
@@ -951,11 +951,11 @@ These endpoints have been strongly versioned to make it easier to develop applic
 * Individual fields will never be removed for any given endpoint
 * New endpoints may be added
 * New fields may be added to existing endpoints
-* New versions of the api may be added in the future as a separate endpoint (eg., `api/v2`).  New versions are *not* required to be backwards compatible.
+* New versions of the api may be added in the future as a separate endpoint (e.g., `api/v2`).  New versions are *not* required to be backwards compatible.
 * Api versions may be dropped, but only after at least one minor release of co-existing with a new api version.
 
 Note that even when examining the UI of running applications, the `applications/[app-id]` portion is
-still required, though there is only one application available.  Eg. to see the list of jobs for the
+still required, though there is only one application available.  E.g. to see the list of jobs for the
 running app, you would go to `http://localhost:4040/api/v1/applications/[app-id]/jobs`.  This is to
 keep the paths consistent in both modes.
 
